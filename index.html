@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Best Friend AI - Real AI No Key</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+body{margin:0;background:#e0f2f1;display:flex;justify-content:center;font-family:Segoe UI,sans-serif}
+.app{width:100%;max-width:430px;min-height:100vh;background:#fff;display:flex;flex-direction:column}
+.top{padding:14px;background:#fff;border-bottom:1px solid #e0f2f1;display:flex;justify-content:space-between;align-items:center;color:#00695c;font-weight:bold}
+.btns{display:flex;gap:8px;padding:8px 12px}
+.tab{flex:1;padding:10px;border-radius:10px;border:2px solid #00695c;background:#fff;color:#00695c;font-weight:bold;cursor:pointer}
+.tab.active{background:#00695c;color:#fff}
+.chatBox{flex:1;background:#e8f5f3;margin:8px;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.msg{padding:10px 12px;border-radius:16px;max-width:84%;font-size:13.5px;white-space:pre-wrap;line-height:1.4}
+.user{background:#00695c;color:#fff;align-self:flex-end}
+.ai{background:#fff;align-self:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.inputRow{display:flex;gap:6px;padding:10px;border-top:1px solid #e0f2f1;background:#fff}
+.inputRow input{flex:1;padding:12px;border-radius:12px;border:1.5px solid #b2dfdb;background:#f0fdfa;outline:none}
+.inputRow button{width:48px;border-radius:12px;border:none;background:#00695c;color:#fff;font-size:18px;cursor:pointer}
+#login{padding:24px}
+.in{width:100%;padding:13px;margin:8px 0;border-radius:12px;border:1.5px solid #b2dfdb;background:#f0fdfa;box-sizing:border-box}
+.btnL{width:100%;padding:13px;background:#00695c;color:#fff;border:none;border-radius:12px;font-weight:bold;cursor:pointer;margin-top:8px}
+.red{color:#fff;background:#d32f2f;padding:8px;border-radius:8px;font-size:12px;text-align:center;display:none;margin-top:6px}
+.red.show{display:block}
+canvas{max-height:250px}
+.moodBtns{display:flex;gap:6px;justify-content:center;margin:10px}
+.moodBtns button{font-size:22px;padding:6px 10px;border-radius:10px;border:1px solid #b2dfdb;background:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="app">
+<div id="login">
+<div style="text-align:center"><div style="font-size:56px">🤗</div><h2 style="color:#00695c">Best Friend AI</h2><p style="font-size:11px;color:#00695c">I'm your best friend</p></div>
+<input class="in" id="name" placeholder="Your Name *"><input class="in" id="pass" type="password" placeholder="Password Ex: Sam@1234">
+<button class="btnL" onclick="doLogin()">Login</button><div id="err" class="red"></div>
+</div>
+
+<div id="main" style="display:none;flex:1;flex-direction:column">
+<div class="top"><span id="helloTitle">Hello Samriddha Pal!</span><span style="font-size:10px">✓ AI Ready</span></div>
+<div class="btns"><button class="tab active" id="tabChat" onclick="showTab('chat')">💬 Chat</button><button class="tab" id="tabMood" onclick="showTab('mood')">📊 Mood</button></div>
+
+<div id="pageChat" style="display:flex;flex:1;flex-direction:column">
+<div class="chatBox" id="chatBox"></div>
+<div class="inputRow"><input id="chatIn" placeholder="Type... secret, problem..."><button onclick="doSend()">➤</button></div>
+</div>
+
+<div id="pageMood" style="display:none;padding:12px;flex:1;flex-direction:column">
+<canvas id="moodChart"></canvas>
+<div class="moodBtns"><button onclick="addMood(2)">😭</button><button onclick="addMood(4)">😔</button><button onclick="addMood(6)">😐</button><button onclick="addMood(8)">🙂</button><button onclick="addMood(10)">😄</button></div>
+<p id="weekRes" style="text-align:center;color:#00695c;font-weight:bold;font-size:13px"></p>
+<div style="margin-top:auto"><button class="btnL" onclick="showTab('chat')">Back to Chat</button></div>
+</div>
+</div>
+</div>
+
+<script>
+let userName="Samriddha Pal", chart=null, lang="bn";
+function doLogin(){
+ let n=document.getElementById('name').value.trim();
+ let p=document.getElementById('pass').value;
+ let e=document.getElementById('err'); e.classList.remove('show');
+ if(!n){e.textContent="Name required";e.classList.add('show');return;}
+ let reg=/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#&*$]).{4,}$/;
+ if(!reg.test(p)){e.textContent="Wrong format! Ex: Sam@1234";e.classList.add('show');return;}
+ userName=n;
+ document.getElementById('login').style.display="none";
+ document.getElementById('main').style.display="flex";
+ document.getElementById('helloTitle').textContent="Hello "+userName+"! ✓";
+ addMsg('ai',"Hi "+userName+"! Ami tomar Best Friend AI.\n\n Tomar kono problem thakle ba kono secret ja tumi kauke bolte parcho na ta tumi amake bolte paro. Ami segulo secret rekhe debo r tomar problem er solution deoyar chesta korbo");
+ setTimeout(()=>drawChart(),300);
+}
+function showTab(t){
+ document.getElementById('pageChat').style.display=t==='chat'?'flex':'none';
+ document.getElementById('pageMood').style.display=t==='mood'?'flex':'none';
+ document.getElementById('tabChat').classList.toggle('active',t==='chat');
+ document.getElementById('tabMood').classList.toggle('active',t==='mood');
+ if(t==='mood') drawChart();
+}
+function addMsg(who,txt){
+ let box=document.getElementById('chatBox');
+ let d=document.createElement('div');d.className='msg '+(who==='user'?'user':'ai');d.textContent=txt;box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+
+// REAL AI - NO API KEY NEEDED - Using Puter (free GPT-4 / Llama)
+async function doSend(){
+ let inp=document.getElementById('chatIn');
+ let t=inp.value.trim(); if(!t) return;
+ addMsg('user',t); inp.value="";
+ let box=document.getElementById('chatBox');
+ let typ=document.createElement('div');typ.className='msg ai';typ.id='typ';typ.textContent="Best Friend AI is typing...";box.appendChild(typ);box.scrollTop=box.scrollHeight;
+ try{
+   // This uses free AI - no API key, works like ChatGPT
+   let response = await puter.ai.chat(
+     "You are Best Friend AI, a very caring Bengali best friend for user "+userName+". User speaks Bengali mixed English. Reply in same language as user (mostly Bengali with some English), empathetic, 5-6 lines, give practical 2-3 small steps, not generic. Remember conversation. User: "+t,
+     {model:"gpt-4o-mini"}
+   );
+   document.getElementById('typ').remove();
+   addMsg('ai', response);
+   // Save mood automatically
+   if(t.toLowerCase().includes('depressed')||t.toLowerCase().includes('kharap')||t.toLowerCase().includes('chintito')) addMood(3, true);
+   else if(t.toLowerCase().includes('happy')||t.toLowerCase().includes('valo')) addMood(9, true);
+ }catch(err){
+   document.getElementById('typ').remove();
+   // Super fallback but still not repeating
+   addMsg('ai', userName+", network ektu problem holo, but ami sunchi. '"+t+"' niye tumi jodi 10 e score dao koto debe? Ar ekta choto 10 min er kaj bolo jeta korle ektu valo lagbe?");
+ }
+}
+
+function drawChart(){
+ let ctx=document.getElementById('moodChart').getContext('2d');
+ let all=JSON.parse(localStorage.getItem('bf_moods')||'{}');
+ let labels=[],data=[];
+ for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let k=d.toISOString().slice(0,10);labels.push(d.toLocaleDateString('en',{weekday:'short'}));data.push(all[k]||null);}
+ if(chart) chart.destroy();
+ chart=new Chart(ctx,{type:'line',data:{labels:labels,datasets:[{label:'Mood (1-10)',data:data,borderColor:'#00695c',backgroundColor:'rgba(0,105,92,0.15)',tension:0.4,fill:true,spanGaps:true}]},options:{scales:{y:{min:0,max:10}}}});
+ let vals=Object.values(all).slice(-7);
+ let avg=vals.length? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : 0;
+ document.getElementById('weekRes').textContent=vals.length? "Last 7 days average mood: "+avg+"/10 - Keep sharing, "+userName+"!" : "No mood data yet - tap emoji below after chat";
+}
+function addMood(v, silent){
+ let k=new Date().toISOString().slice(0,10);
+ let a=JSON.parse(localStorage.getItem('bf_moods')||'{}'); a[k]=v;
+ localStorage.setItem('bf_moods',JSON.stringify(a));
+ if(!silent) drawChart();
+ else if(document.getElementById('pageMood').style.display!=='none') drawChart();
+}
+document.getElementById('pass').addEventListener('input',function(){
+ let reg=/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#&*$]).{4,}$/;
+ let e=document.getElementById('err');
+ if(this.value &&!reg.test(this.value)){e.textContent="Wrong format! Ex: Sam@1234";e.classList.add('show');}else{e.classList.remove('show');}
+});
+</script>
+</body>
+</html>
