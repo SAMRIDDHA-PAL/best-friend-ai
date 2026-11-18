@@ -26,10 +26,10 @@ No API Key Needed. 100% Free. Works on Mobile.
 
 ## 🛠️ Tech Used
 
-- HTML / CSS / JavaScript
-- Chart.js - For the Mood Graph
-- Puter.js - Free AI (GPT-4o-mini)
-- Deployed on Render - Static Site
+- **HTML / CSS / JavaScript**
+- **Chart.js** - For the Mood Graph
+- **Puter.js** - Free AI (GPT-4o-mini)
+- **Deployed on Render** - Static Site
 
 ## 📦 Deploy Yourself
 
